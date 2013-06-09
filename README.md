@@ -34,17 +34,16 @@ This version has only been tested on a Mac running OS 10.8.3 with python version
 
 ### Dependencies:
 
-Sound synthesis is done using ChucK. More information can be found [here](http://chuck.cs.princeton.edu/ "ChucK").
+Sound synthesis is done using ChucK. More information and downloads are at:  [http://chuck.cs.princeton.edu/](http://chuck.cs.princeton.edu/ "ChucK").
 
-Message passing between the message dispatcher is done using the pyOsc python interface to OSC. More information: [pyOsc](https://trac.v2.nl/wiki/pyOSC "pyOsc"). Alternatively:
+Message passing between the message dispatcher and ChucK is done using the pyOsc python interface to OSC. More information: [pyOsc](https://trac.v2.nl/wiki/pyOSC "pyOsc"). Install:
 
     sudo easy_install pyOsc
 
-The python interface for DTrace is python-dtrace. More infor [here](http://tmetsch.github.io/python-dtrace/ "python-dtrace"). Alternatively:
+The python interface for DTrace is python-dtrace. More information: [python-dtrace](http://tmetsch.github.io/python-dtrace/ "python-dtrace"). Install:
 
     sudo easy_install python-dtrace
 
-The python-dtrace module requires Cython
-It requires [Cython](http://www.cython.org/ "Cython"):
+The python-dtrace module requires Cython. More information: [Cython](http://www.cython.org/ "Cython"). Install:
 
     sudo easy_install Cython
