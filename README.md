@@ -3,13 +3,13 @@
 SOS: Sonify Your Operating System
 
 ## About
-'dsonify.py' sonifies a few aspects of the Mac OS filesystem. In particular, it inserts dtrace probes on 6 syscalls related to files. Each probe triggers a unique synthesized sound:
+'dsonify.py' sonifies a few aspects of the Mac OS filesystem. In particular, it inserts dtrace probes on 6 syscalls related to file management by the operating system. Each probe triggers a unique synthesized sound:
 
 * pread, read, readv: The frequency of a sine tone is randomly modulated between 50 and 300 Hz. Playback is in the left audio channel only.
 			                
 * pwrite, write, write: The frequency of a sine tone is randomly modulated between 50 and 300 Hz. Playback is in the left audio channel only.
 
-The read and writes provide a constant babble of sound, reflecting the constant rw activity of the kernel.
+The read and write syscalls provide a constant babble of sound, reflecting the constant rw activity of the kernel.
 	
 * open: A synthesized sitar sound plays every time the kernel tries to open a file for read or write. The plucked note has a fundamental frequency of 440 hz (concert A) and is panned slightly to the left.
 	                        
