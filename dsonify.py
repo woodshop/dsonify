@@ -5,13 +5,12 @@ import OSC
 import subprocess
 import signal
 import sys
+import argparse
 
 """
-Written by Andy Sarroff, March 2013. To run, make sure that you have
-'dsonify.ck' and 'dsonify.d' in the same directory as this file.
+Written by Andy Sarroff, March 2013.
 """
 
-SCRIPT = open('dsonify.d', 'r').read()
 client = None
 thr = None
 p = None
@@ -24,31 +23,10 @@ def simple_chewrec(action):
 
 def simple_out(value):
     try:
-        if value.split()[0] == "read":
-            #print("READ: {0}".format(value))
-            sendOSCMsg("dsonify/read", [np.random.randint(50, 300)])
-        if value.split()[0] == "write":
-            #print("WRITE: {0}".format(value))
-            sendOSCMsg("dsonify/write", [np.random.randint(50, 300)])
-        if value.split()[0] == "open":
-            #print("OPEN: {0}".format(value))
-            sendOSCMsg("dsonify/open", [440.0])
-        if value.split()[0] == "close":
-            #print("CLOSE: {0}".format(value))
-            sendOSCMsg("dsonify/close", [440*2**(8./12)])
-        if value.split()[0] == "fsync":
-            #print("FSYNC: {0}".format(value))
-            sendOSCMsg("dsonify/fsync", [220.0])
-        if value.split()[0] == "fcntl":
-            #print("FCNTL: {0}".format(value))
-            if value.split()[1] == "F_GETFL":
-                sendOSCMsg("dsonify/fcntl", [0])
-            if value.split()[1] == "F_SETFL":
-                sendOSCMsg("dsonify/fcntl", [1])
-            if value.split()[1] == "F_GETFD":
-                sendOSCMsg("dsonify/fcntl", [2])
-            if value.split()[1] == "F_SETFD":
-                sendOSCMsg("dsonify/fcntl", [3])
+        v = value.split();
+        if len(v) == 1:
+            v.append('null')
+        sendOSCMsg(v[0], [v[1]])
     except OSC.OSCClientError:
         pass
     pass
@@ -68,10 +46,6 @@ def sendOSCMsg(address, data):
         m.append(d)
     client.send(m)
 
-def chuck(filename):
-    p = subprocess.Popen(["/usr/bin/chuck", filename])
-    p.kill()
-
 def signal_handler(signal, frame):
     global thr,p
     print('Shutting down.')
@@ -80,22 +54,33 @@ def signal_handler(signal, frame):
     p.kill()
     sys.exit(0)
 
-def main():
+def main(probeScript, synthFile):
     global thr,p
     print('Starting. Press CTRL-C to stop.')
-    p = subprocess.Popen(["/usr/bin/chuck", 'dsonify.ck'])
+    p = subprocess.Popen(["chuck", synthFile])
     initOSCClient()
-    thr = dtrace.DTraceConsumerThread(script=SCRIPT, consume=True,
+    thr = dtrace.DTraceConsumerThread(script=probeScript, consume=True,
                                       chew_func=simple_chew,
                                       chewrec_func=simple_chewrec,
                                       out_func=simple_out,
                                       walk_func=simple_walk,
                                       sleep=0)
+    signal.signal(signal.SIGINT, signal_handler)
     thr.start()
     while(1):
         time.sleep(60)
 
-signal.signal(signal.SIGINT, signal_handler)
-
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Sonify your operating system. This program takes ' + \
+            'dtrace messages as specified in the probeFile and passes them' + \
+            ' to the ChucK synthesizers as specified in the synthFile. ' + \
+            'You must be root to run this application. See the ' + \
+            'accompanying README for more information.')
+    parser.add_argument('probeFile', type=str, 
+                        help="a probe script written for dtrace")
+    parser.add_argument('synthFile', type=str, 
+                        help="a synth script written for ChucK")
+    args = parser.parse_args()
+    probeScript = open(args.probeFile, 'r').read()
+    main(probeScript, args.synthFile)

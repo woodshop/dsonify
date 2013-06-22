@@ -1,44 +1,42 @@
 OscRecv recv;
 9000 => recv.port;
 recv.listen();
-recv.event( "dsonify/read", "i" ) @=> OscEvent oe_read;
-recv.event( "dsonify/write", "i" ) @=> OscEvent oe_write;
-recv.event( "dsonify/open", "f" ) @=> OscEvent oe_open;
-recv.event( "dsonify/close", "f" ) @=> OscEvent oe_close;
-recv.event( "dsonify/fsync", "f" ) @=> OscEvent oe_fsync;
-recv.event( "dsonify/fcntl", "i" ) @=> OscEvent oe_fcntl;
+recv.event( "read, s" ) @=> OscEvent oe_read;
+recv.event( "write, s" ) @=> OscEvent oe_write;
+recv.event( "open, s" ) @=> OscEvent oe_open;
+recv.event( "close, s" ) @=> OscEvent oe_close;
+recv.event( "fsync, s" ) @=> OscEvent oe_fsync;
+recv.event( "fcntl, s" ) @=> OscEvent oe_fcntl;
 
 main();
 
 fun void main() {
-    // <<< "main" >>>;
-    spork ~ inst_read("calling inst_read");
-    spork ~ inst_write("calling inst_write");
-    spork ~ inst_open("calling inst_open");
-    spork ~ inst_close("calling inst_close");
-    spork ~ inst_fsync("calling inst_fsync");
-    spork ~ inst_fcntl("calling inst_fcntl");
+    spork ~ inst_read();
+    spork ~ inst_write();
+    spork ~ inst_open();
+    spork ~ inst_close();
+    spork ~ inst_fsync();
+    spork ~ inst_fcntl();
     1::day => now;
 }
 
-fun void inst_read( string st )
+fun void inst_read()
 {
-    // <<< st >>>;
     SinOsc s => Pan2 p => dac;
     0.2 => s.gain;
     -1 => p.pan;
     while(true) {
         oe_read => now;
         while (oe_read.nextMsg() != 0)
-    	{
-	    oe_read.getInt() => s.freq;
+    	{   
+	    oe_read.getString();
+	    Math.random2f(50, 300) => s.freq;
     	}
     }
 }
 
-fun void inst_write( string st )
+fun void inst_write()
 {
-    // <<< st >>>;
     SinOsc s => Pan2 p => dac;
     0.2 => s.gain;
     1 => p.pan;
@@ -46,14 +44,14 @@ fun void inst_write( string st )
         oe_write => now;
         while (oe_write.nextMsg() != 0)
     	{
-	    oe_write.getInt() => s.freq;
+	    oe_write.getString();
+	    Math.random2f(50, 300) => s.freq;
     	}
     }
 }
 
-fun void inst_open( string st )
+fun void inst_open()
 {
-    // <<< st >>>;
     Sitar s => Pan2 p => dac;
     -0.75 => p.pan;
     0.2 => s.gain;
@@ -61,15 +59,15 @@ fun void inst_open( string st )
         oe_open => now;
         while (oe_open.nextMsg() != 0)
     	{
-	    oe_open.getFloat() => s.freq;
+	    oe_open.getString();
+	    440.0 => s.freq;
 	    1.0 => s.noteOn;
     	}
     }
 }
 
-fun void inst_close( string st )
+fun void inst_close()
 {
-    // <<< st >>>;
     Sitar s => Pan2 p => dac;
     0.75 => p.pan;
     0.2 => s.gain;
@@ -77,15 +75,15 @@ fun void inst_close( string st )
         oe_close => now;
         while (oe_close.nextMsg() != 0)
     	{
-	    oe_close.getFloat() => s.freq;
+	    oe_close.getString();
+	    440.0*Math.pow(2, 8.0/12) => s.freq;
 	    1.0 => s.noteOn;
     	}
     }
 }
 
-fun void inst_fsync( string st )
+fun void inst_fsync()
 {
-    // <<< st >>>;
     TubeBell s => Chorus c => dac;
     0.5 => s.gain;
     0.5 => c.mix;
@@ -94,15 +92,15 @@ fun void inst_fsync( string st )
         oe_fsync => now;
         while (oe_fsync.nextMsg() != 0)
     	{
-	    oe_fsync.getFloat() => s.freq;
+	    oe_fsync.getString();
+	    220.0 => s.freq;
 	    1.0 => s.noteOn;
     	}
     }
 }
 
-fun void inst_fcntl( string st )
+fun void inst_fcntl()
 {
-    // <<< st >>>;
     TriOsc car => BPF fil1 => ADSR a => JCRev j => dac;
     SinOsc mod => BPF fil2 => blackhole;
     0.2 => car.gain;
@@ -123,17 +121,17 @@ fun void inst_fcntl( string st )
 	 a.keyOff();
         while (oe_fcntl.nextMsg() != 0)
     	{
-	    oe_fcntl.getInt() => int ptr;
-	    if (ptr == 0) {
+	    oe_fcntl.getString() => string ptr;
+	    if (ptr == "F_GETFL") {
 	       120.0 => car.freq;
 	    }
-	    if (ptr == 1) {
+	    if (ptr == "F_SETFL") {
 	       240.0 => car.freq;
 	    }
-	    if (ptr == 2) {
+	    if (ptr == "F_GETFD") {
 	       480.0 => car.freq;
 	    }
-	    if (ptr == 3) {
+	    if (ptr == "F_SETFD") {
 	       960.0 => car.freq;
 	    }
 	    a.keyOn();
