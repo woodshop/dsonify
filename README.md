@@ -3,36 +3,28 @@
 SOS: Sonify Your Operating System
 
 ## About
-'dsonify.py' sonifies a few aspects of the Mac OS filesystem. In particular, it inserts dtrace probes on 6 syscalls related to file management by the operating system. Each probe triggers a unique synthesized sound:
+'dsonify.py' provides a framework for sonifying aspects of a Unix-like operating system. It operates as a message dispatcher between a set of operating system probes written for dtrace and a set of audio synthesizers written for ChucK.
 
-* pread, read, readv: The frequency of a sine tone is randomly modulated between 50 and 300 Hz. Playback is in the left audio channel only.
-			                
-* pwrite, write, write: The frequency of a sine tone is randomly modulated between 50 and 300 Hz. Playback is in the left audio channel only.
+To run this program, you will need a probe file and a synth file. The probe file specifies a set of probes that will be fired by dtrace. For each probe in your probe file script, use the following syntax:
 
-The read and write syscalls provide a constant babble of sound, reflecting the constant rw activity of the kernel.
-	
-* open: A synthesized sitar sound plays every time the kernel tries to open a file for read or write. The plucked note has a fundamental frequency of 440 hz (concert A) and is panned slightly to the left.
-	                        
-* close: A synthesized sitar sound plays every time the kernel tries to closes a file for read or write. The plucked note is a minor 6th ablove an A.
-							
-* fsync: Whenever the kernel synchronizes a file on permanant storage a low tubular sound is played.
-	                        
-* fnctl: Any inspection or changes to a file descripter are caught by dtrace. The lookup table for fd changes is large and has been written into dsonify.d. At the moment, dsonify.py sonifies	any gets or sets to the descriptor flags. "F_GETFL", "F_SETFL", "F_GETFD", and "F_SETFD" share the same freuency modulated tone but are separated by octaves. "F_GETFL" and "F_SETFL" are usually triggered at neraly the same time, as are "F_GETFD", and "F_SETFD".
+	printf("message [value]");
 
-The main script, 'dsonify.py' loads a dtrace script, 'dsonify.d'. The script is sent via a dtrace threaded consumer to be compiled. A chuck sound synthesis engine is started on another thread and loads the synthesis functions stored in 'dsonify.ck'. The dtrace consumer in python receives probe messages. The messages are parsed, and appropriate commands are sent via udp to the chuck server.
+dsonify.py will pass "message" as the OSC message address to the ChucK synthesizer. You may provide an optional [value] as a contiguous string. The message dispatcher will parse "message" and (if it exists) "value". It will send message and value to port 9000 on the local host using the OSC protocol. It is up to you to write a ChucK script that handles the events and accompanying values. See the included demos as a coding guide.
 
-To run this program, make sure 'dsonify.d' and dsonify.ck' are in the same directory as 'dsonify.py'. It is probably best to wear headphones, since the L/R channel placement is an important part of the sonification. Then simply start a terminal session as root and enter:
+To run dsonify, type:
 
-    python dsonify.py
+	sudo python dsonify.py probeFile synthFile
+
+where probeFile and synthFile are the respective file names of the the dtrace probe script and ChucK synth script. You must have python, dtrace, and chuck in your file search path.
 
 To terminate, enter CTRL-C.
 
 This version has only been tested on a Mac running OS 10.8.3 with python version 2.7.5.
 
-
 ## To Install
 
 ### Dependencies:
+We assume that you already have dtrace and python installed.
 
 Sound synthesis is done using ChucK. More information and downloads are at:  [http://chuck.cs.princeton.edu/](http://chuck.cs.princeton.edu/ "ChucK").
 
@@ -47,3 +39,29 @@ The python interface for DTrace is python-dtrace. More information: [python-dtra
 The python-dtrace module requires Cython. More information: [Cython](http://www.cython.org/ "Cython"). Install:
 
     sudo easy_install Cython
+
+## Demos
+We have included two demos to get you started. The first demo sonifies all file opens, closes, reads, writes, and some other file system file managment operations. The second demo sonifies outgoing internet connections.
+
+### Demo 1
+It is probably best to wear headphones, since the L/R channel placement is an important part of the sonification. Then simply start a terminal session as root and enter:
+
+    sudo python dsonify.py demos/filesProbe.d demos/filesSynth.ck
+
+This demo inserts dtrace probes on 6 syscalls related to file management by the operating system. Each probe triggers a unique synthesized sound:
+
+* pread, read, readv: The frequency of a sine tone is randomly modulated between 50 and 300 Hz. Playback is in the left audio channel only.
+			                
+* pwrite, write, write: The frequency of a sine tone is randomly modulated between 50 and 300 Hz. Playback is in the right audio channel only.
+
+The read and write syscalls provide a constant babble of sound, reflecting the constant rw activity of the kernel.
+	
+* open: A synthesized sitar sound plays every time the kernel tries to open a file. The plucked note has a fundamental frequency of 440 hz (concert A) and is panned mostly to the left.
+	                        
+* close: A synthesized sitar sound plays every time the kernel tries to close a file for read or write. The plucked note is a minor 6th above a concert A and is panned mostly to the right.
+							
+* fsync: Whenever the kernel synchronizes a file on permanant storage a low tubular sound is played.
+	                        
+* fnctl: Any inspection or changes to a file descripter are caught by dtrace. The lookup table for fd changes is large and has been written into filesProbe.d. At the moment, filesSynth.ck sonifies any gets or sets to the descriptor flags. "F_GETFL", "F_SETFL", "F_GETFD", and "F_SETFD" share the same freuency modulated tone but are separated by octaves. "F_GETFL" and "F_SETFL" are usually triggered at nearly the same time, as are "F_GETFD", and "F_SETFD".
+
+### Demo 2
