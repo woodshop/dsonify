@@ -125,13 +125,13 @@ fun void inst_fcntl()
 	    if (ptr == "F_GETFL") {
 	       120.0 => car.freq;
 	    }
-	    if (ptr == "F_SETFL") {
+	    else if (ptr == "F_SETFL") {
 	       240.0 => car.freq;
 	    }
-	    if (ptr == "F_GETFD") {
+	    else if (ptr == "F_GETFD") {
 	       480.0 => car.freq;
 	    }
-	    if (ptr == "F_SETFD") {
+	    else if (ptr == "F_SETFD") {
 	       960.0 => car.freq;
 	    }
 	    a.keyOn();
