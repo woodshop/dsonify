@@ -13,10 +13,12 @@ fun void main() {
 fun void inst_ipconnect()
 {
     // some synth shit
-    SqrOsc car => ADSR a => JCRev j => dac;
+    SqrOsc car => LPF fil => ADSR a => JCRev j => dac;
     0.5 => car.gain;
     700 => car.freq;
     0.08 => j.mix;
+    5000 => fil.freq;
+    0.5 => fil.Q;
     
     a.set(10::ms, 500::ms, 1.0, 10::ms);
     a.keyOff();
@@ -29,11 +31,11 @@ fun void inst_ipconnect()
         while (oe_ipconnect.nextMsg() != 0)
         {
             oe_ipconnect.getString() => string ptr;
-            Std.rand2f(100,400) => car.freq;
-            <<<ptr>>>;
+            atoi(ptr) => car.freq;
             a.keyOn();
         }
         520::ms => now;
         a.keyOff();
     }
 }
+
