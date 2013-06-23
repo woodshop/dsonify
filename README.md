@@ -65,3 +65,8 @@ The read and write syscalls provide a constant babble of sound, reflecting the c
 * fnctl: Any inspection or changes to a file descripter are caught by dtrace. The lookup table for fd changes is large and has been written into filesProbe.d. At the moment, filesSynth.ck sonifies any gets or sets to the descriptor flags. "F_GETFL", "F_SETFL", "F_GETFD", and "F_SETFD" share the same freuency modulated tone but are separated by octaves. "F_GETFL" and "F_SETFL" are usually triggered at nearly the same time, as are "F_GETFD", and "F_SETFD".
 
 ### Demo 2
+To run this demo, start a terminal session as root and enter:
+
+	sudo python dsonify.py demos/ipconnectProbe.d demos/ipconnectSynth.ck
+	
+This demo inserts a trace probe on outgoing internet connections and maps their port number to the pitch of a filtered square wave.
