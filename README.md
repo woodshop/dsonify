@@ -43,6 +43,10 @@ The python-dtrace module requires Cython. More information: [Cython](http://www.
 ## Demos
 We have included two demos to get you started. The first demo sonifies all file opens, closes, reads, writes, and some other file system file managment operations. The second demo sonifies outgoing internet connections.
 
+Both demos are based on source code available at [http://www.dtracebook.com/](http://www.dtracebook.com/ "dtracebook"), which is the online accompanient to the excellent DTrace reference:
+
+* _Dynamic Tracing in Oracle Solaris, Mac OS X, and FreeBSD_ by Brendan Gregg and Jim Mauro, Prentice Hall 2011.
+
 ### Demo 1
 It is probably best to wear headphones, since the L/R channel placement is an important part of the sonification. Then simply start a terminal session as root and enter:
 
