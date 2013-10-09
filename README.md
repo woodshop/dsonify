@@ -19,7 +19,7 @@ where probeFile and synthFile are the respective file names of the the dtrace pr
 
 To terminate, enter CTRL-C.
 
-This version has only been tested on a Mac running OS 10.8.3 with python version 2.7.5.
+This version has only been tested on a Mac running OS 10.8.5 with python version 2.7.5.
 
 ## To Install
 
@@ -48,7 +48,7 @@ Both demos are based on source code available at [http://www.dtracebook.com/](ht
 * _Dynamic Tracing in Oracle Solaris, Mac OS X, and FreeBSD_ by Brendan Gregg and Jim Mauro, Prentice Hall 2011.
 
 ### Demo 1
-It is probably best to wear headphones, since the L/R channel placement is an important part of the sonification. Then simply start a terminal session as root and enter:
+It is probably best to wear headphones, since the L/R channel placement is an important part of the sonification. Then simply start a terminal session and enter:
 
     sudo python dsonify.py demos/filesProbe.d demos/filesSynth.ck
 
@@ -69,8 +69,8 @@ The read and write syscalls provide a constant babble of sound, reflecting the c
 * fnctl: Any inspection or changes to a file descripter are caught by dtrace. The lookup table for fd changes is large and has been written into filesProbe.d. At the moment, filesSynth.ck sonifies any gets or sets to the descriptor flags. "F_GETFL", "F_SETFL", "F_GETFD", and "F_SETFD" share the same freuency modulated tone but are separated by octaves. "F_GETFL" and "F_SETFL" are usually triggered at nearly the same time, as are "F_GETFD", and "F_SETFD".
 
 ### Demo 2
-To run this demo, start a terminal session as root and enter:
+To run this demo, start a terminal session and enter:
 
 	sudo python dsonify.py demos/ipconnectProbe.d demos/ipconnectSynth.ck
 	
-This demo inserts a trace probe on outgoing internet connections and maps their port number to the pitch of a filtered square wave.
+This demo inserts a trace probe on outgoing internet connections and maps their port number to the pitch of a filtered square wave. As your operating system makes outgoing connections web servers, DNS servers, mail servers, etc. you'll hear filtered square wave tones. These events normally occur regularly on a personal computer. When one here's an unusual pitch, their operating system is connecting to the network on an unusual port.
