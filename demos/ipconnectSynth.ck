@@ -31,7 +31,7 @@ fun void inst_ipconnect()
         while (oe_ipconnect.nextMsg() != 0)
         {
             oe_ipconnect.getString() => string ptr;
-            atoi(ptr) => car.freq;
+            Std.atoi(ptr) => car.freq;
             a.keyOn();
         }
         520::ms => now;
